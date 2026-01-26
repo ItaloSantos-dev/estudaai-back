@@ -18,6 +18,9 @@ public class QuestionModel {
     @Column(nullable = false)
     QuestionType type;
 
+    @Column(nullable = false, unique = true)
+    private String title;
+
     @Column(nullable = false)
     private String link;
 
@@ -28,6 +31,14 @@ public class QuestionModel {
 
     public UUID getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public void setId(UUID id) {

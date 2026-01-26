@@ -15,7 +15,7 @@ public class ModuleModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false ,unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -28,6 +28,14 @@ public class ModuleModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "module")
     private Set<SubmoduleModel> submodules = new HashSet<>();
+
+    public ModuleModel(){
+
+    }
+    public ModuleModel(String name, Duration averageDuration) {
+        this.name = name;
+        this.averageDuration = averageDuration;
+    }
 
 
     public UUID getId() {

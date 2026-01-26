@@ -2,7 +2,6 @@ package br.com.italo.estuda_ai.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import org.apache.catalina.User;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,7 +16,7 @@ public class CourseModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -33,6 +32,19 @@ public class CourseModel {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private Set<ModuleModel> modules = new HashSet<>();
+
+    public CourseModel(){
+
+    }
+
+    public CourseModel(UUID id, String name, String description, Duration averageDuration, Set<UserModel> users, Set<ModuleModel> modules) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.averageDuration = averageDuration;
+        this.users = users;
+        this.modules = modules;
+    }
 
     public UUID getId() {
         return id;

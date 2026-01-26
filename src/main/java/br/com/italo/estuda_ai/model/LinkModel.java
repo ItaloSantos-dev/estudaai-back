@@ -13,12 +13,23 @@ public class LinkModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(unique = true, nullable = false)
+    private String title;
+
     @Column(nullable = false)
     private String link;
 
     @ManyToOne
     @JoinColumn(name = "submodule_id")
     private SubmoduleModel submodule;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public UUID getId() {
         return id;

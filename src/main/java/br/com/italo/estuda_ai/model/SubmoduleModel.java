@@ -16,7 +16,7 @@ public class SubmoduleModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false ,unique = true)
     private String name;
 
     @Column(nullable = false)
