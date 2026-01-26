@@ -2,6 +2,7 @@ package br.com.italo.estuda_ai.service;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestQuestion;
 import br.com.italo.estuda_ai.DTOs.responses.ResponseQuestion;
+import br.com.italo.estuda_ai.exceptions.ResourceNotFoundException;
 import br.com.italo.estuda_ai.model.QuestionModel;
 import br.com.italo.estuda_ai.model.SubmoduleModel;
 import br.com.italo.estuda_ai.repository.QuestionRepository;
@@ -27,7 +28,7 @@ public class QuestionService {
     }
 
     public QuestionModel getQuestionById(String id){
-        return this.questionRepository.findById(UUID.fromString(id)).get();
+        return this.questionRepository.findById(UUID.fromString(id)).orElseThrow(()->new ResourceNotFoundException("Questão"));
     }
 
     public QuestionModel createQuestion(RequestQuestion request){
@@ -45,11 +46,18 @@ public class QuestionService {
     }
 
     public void deleteQuestion(String  id){
-        this.questionRepository.deleteById(UUID.fromString(id));
+        UUID questionId = UUID.fromString(id);
+        if(! this.questionRepository.existsById(questionId)) throw new ResourceNotFoundException("Questão");
+        this.questionRepository.deleteById(questionId);
     }
 
     public QuestionModel updateQuestion(String id, RequestQuestion request) {
-        QuestionModel question = this.entityManager.getReference(QuestionModel.class, UUID.fromString(id));
+
+        UUID questionId = UUID.fromString(id);
+
+        if(! this.questionRepository.existsById(questionId)) throw new ResourceNotFoundException("Questão");
+
+        QuestionModel question = this.entityManager.getReference(QuestionModel.class, questionId);
 
         question.setTitle(request.title());
         question.setLink(request.link());

@@ -2,8 +2,7 @@ package br.com.italo.estuda_ai.service;
 
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestCourse;
-import br.com.italo.estuda_ai.DTOs.responses.ResponseModule;
-import br.com.italo.estuda_ai.DTOs.responses.relations.ResponseModulesOfCourse;
+import br.com.italo.estuda_ai.exceptions.ResourceNotFoundException;
 import br.com.italo.estuda_ai.model.CourseModel;
 import br.com.italo.estuda_ai.model.ModuleModel;
 import br.com.italo.estuda_ai.repository.CourseRepository;
@@ -11,8 +10,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.util.*;
@@ -30,7 +27,8 @@ public class CourseService {
     }
 
     public CourseModel getCourseById(String id){
-        return  this.courseRepository.findById(UUID.fromString(id)).get();
+        CourseModel course =  this.courseRepository.findById(UUID.fromString(id)).orElseThrow(()->new ResourceNotFoundException("Curso"));
+        return course;
     }
 
 
@@ -40,33 +38,39 @@ public class CourseService {
         newCourse.setName(request.name());
         newCourse.setDescription(request.description());
         newCourse.setAverageDuration(Duration.ofHours(request.averageDuration()));
-
-        this.courseRepository.save(newCourse);
         return newCourse;
     }
 
     public void deleteCourse(String  id){
         UUID courseId = UUID.fromString(id);
+
+        if(! this.courseRepository.existsById(courseId))throw new ResourceNotFoundException("Curso");
+
         this.courseRepository.deleteById(courseId);
     }
 
     public CourseModel updateCourse(String id, RequestCourse request){
 
+        UUID courseId = UUID.fromString(id);
+        if(! this.courseRepository.existsById(courseId))throw new ResourceNotFoundException("Curso");
 
-        CourseModel course = this.courseRepository.findById(UUID.fromString(id)).get();
+        CourseModel courseRef = this.entityManager.getReference(CourseModel.class, courseId);
 
-        course.setName(request.name());
-        course.setDescription(request.description());
-        course.setAverageDuration(Duration.ofHours(request.averageDuration()));
+        courseRef.setName(request.name());
+        courseRef.setDescription(request.description());
+        courseRef.setAverageDuration(Duration.ofHours(request.averageDuration()));
 
 
-        return this.courseRepository.save(course);
+        return this.courseRepository.save(courseRef);
     }
 
 
-    public Set<ModuleModel> getModulesOfCourse(String courseId){
-        Set<ModuleModel> modules = this.courseRepository.findById(UUID.fromString(courseId)).get().getModules();
-        return modules;
+    public Set<ModuleModel> getModulesOfCourse(String id){
+        UUID courseId = UUID.fromString(id);
+        if(!this.courseRepository.existsById(courseId))throw new ResourceNotFoundException("Curso");
+        CourseModel courseRef = entityManager.getReference(CourseModel.class, courseId);
+        return courseRef.getModules();
+
     }
 
 }

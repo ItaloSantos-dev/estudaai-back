@@ -2,6 +2,7 @@ package br.com.italo.estuda_ai.service;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestModule;
 import br.com.italo.estuda_ai.DTOs.responses.ResponseSubmodule;
+import br.com.italo.estuda_ai.exceptions.ResourceNotFoundException;
 import br.com.italo.estuda_ai.model.CourseModel;
 import br.com.italo.estuda_ai.model.ModuleModel;
 import br.com.italo.estuda_ai.model.SubmoduleModel;
@@ -32,7 +33,7 @@ public class ModuleService {
     }
 
     public ModuleModel getModuleById(String id){
-        return this.moduleRepository.findById(UUID.fromString(id)).get();
+        return this.moduleRepository.findById(UUID.fromString(id)).orElseThrow(()->new ResourceNotFoundException("Modulo"));
     }
 
     public ModuleModel createModule(RequestModule request){
@@ -47,10 +48,17 @@ public class ModuleService {
     }
 
     public void deleteModule(String id){
-        this.moduleRepository.deleteById(UUID.fromString(id));
+        UUID moduleId = UUID.fromString(id);
+
+        if(! this.moduleRepository.existsById(moduleId))throw new ResourceNotFoundException("Modulo");
+
+        this.moduleRepository.deleteById(moduleId);
     }
 
     public ModuleModel updateModule(String id, RequestModule request){
+
+        if(!this.moduleRepository.existsById(UUID.fromString(id)))throw new ResourceNotFoundException("Modulo");
+
         ModuleModel module = this.entityManager.getReference(ModuleModel.class, UUID.fromString(id));
 
         module.setName(request.name());
@@ -65,8 +73,13 @@ public class ModuleService {
         return this.moduleRepository.save(module);
     }
 
-    public Set<SubmoduleModel> getSubmodulesOfModule(String moduleId){
-        return this.moduleRepository.findById(UUID.fromString(moduleId)).get().getSubmodules();
+    public Set<SubmoduleModel> getSubmodulesOfModule(String id){
+        UUID moduleId = UUID.fromString(id);
+        if(! this.moduleRepository.existsById(moduleId))throw new ResourceNotFoundException("Modulo");
+
+        ModuleModel moduleRef = this.entityManager.getReference(ModuleModel.class, moduleId);
+
+        return moduleRef.getSubmodules();
     }
 
 

@@ -1,10 +1,12 @@
 package br.com.italo.estuda_ai.service;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestLink;
+import br.com.italo.estuda_ai.exceptions.ResourceNotFoundException;
 import br.com.italo.estuda_ai.model.LinkModel;
 import br.com.italo.estuda_ai.model.SubmoduleModel;
 import br.com.italo.estuda_ai.repository.LinkRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +27,7 @@ public class LinkService {
     }
 
     public  LinkModel getLinkById(String id){
-        return this.linkRepository.findById(UUID.fromString(id)).get();
+        return this.linkRepository.findById(UUID.fromString(id)).orElseThrow(()->new ResourceNotFoundException("Link"));
     }
 
     public LinkModel createLink(RequestLink request){
@@ -41,11 +43,20 @@ public class LinkService {
     }
 
     public void deleteLink(String id){
-        this.linkRepository.deleteById(UUID.fromString(id));
+        UUID linkId = UUID.fromString(id);
+
+        if(! this.linkRepository.existsById(linkId))throw new EntityNotFoundException("Link");
+
+        this.linkRepository.deleteById(linkId);
     }
 
     public LinkModel updateLink(String id, RequestLink request){
-        LinkModel link = this.entityManager.getReference(LinkModel.class,UUID.fromString(id));
+
+        UUID linkId = UUID.fromString(id);
+
+        if(! this.linkRepository.existsById(linkId))throw new EntityNotFoundException("Link");
+
+        LinkModel link = this.entityManager.getReference(LinkModel.class,linkId);
 
         link.setTitle(request.title());
         link.setLink(request.link());

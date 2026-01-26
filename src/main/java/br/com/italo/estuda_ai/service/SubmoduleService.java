@@ -1,6 +1,7 @@
 package br.com.italo.estuda_ai.service;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestSubmodule;
+import br.com.italo.estuda_ai.exceptions.ResourceNotFoundException;
 import br.com.italo.estuda_ai.model.LinkModel;
 import br.com.italo.estuda_ai.model.ModuleModel;
 import br.com.italo.estuda_ai.model.QuestionModel;
@@ -31,7 +32,7 @@ public class SubmoduleService {
     }
 
     public SubmoduleModel getSubmoduleById(String id){
-        return this.submoduleRepository.findById(UUID.fromString(id)).get();
+        return this.submoduleRepository.findById(UUID.fromString(id)).orElseThrow(()->new ResourceNotFoundException("Submodulo"));
     }
 
     public SubmoduleModel createSubmdule(RequestSubmodule request){
@@ -49,12 +50,18 @@ public class SubmoduleService {
     }
 
     public void deleteSubmodule(String id){
-        this.submoduleRepository.deleteById(UUID.fromString(id));
+        UUID submoduleId = UUID.fromString(id);
+        if(! this.submoduleRepository.existsById(submoduleId)) throw new ResourceNotFoundException("Submodulo");
+        this.submoduleRepository.deleteById(submoduleId);
     }
 
 
     public SubmoduleModel updateSubmodule(String id, RequestSubmodule request){
-        SubmoduleModel submodule = this.entityManager.getReference(SubmoduleModel.class, UUID.fromString(id));
+
+        UUID submoduleId = UUID.fromString(id);
+        if(! this.submoduleRepository.existsById(submoduleId)) throw new ResourceNotFoundException("Submodulo");
+
+        SubmoduleModel submodule = this.entityManager.getReference(SubmoduleModel.class, submoduleId);
 
         submodule.setName(request.name());
         submodule.setDescription(request.description());
@@ -68,11 +75,19 @@ public class SubmoduleService {
         return this.submoduleRepository.save(submodule);
     }
 
-    public Set<LinkModel> getLinksOfSubmodule(String submoduleId){
-        return this.submoduleRepository.findById(UUID.fromString(submoduleId)).get().getLinks();
+    public Set<LinkModel> getLinksOfSubmodule(String id){
+
+        UUID submoduleId = UUID.fromString(id);
+        if(! this.submoduleRepository.existsById(submoduleId)) throw new ResourceNotFoundException("Submodulo");
+        SubmoduleModel submoduleRef = entityManager.getReference(SubmoduleModel.class, submoduleId);
+        return submoduleRef.getLinks();
     }
 
-    public Set<QuestionModel> getQuestionsOfSubmodule(String submoduleId){
-        return this.submoduleRepository.findById(UUID.fromString(submoduleId)).get().getQuestions();
+    public Set<QuestionModel> getQuestionsOfSubmodule(String id){
+        UUID submoduleId = UUID.fromString(id);
+        if(! this.submoduleRepository.existsById(submoduleId)) throw new ResourceNotFoundException("Submodulo");
+
+        SubmoduleModel submoduleRef = entityManager.getReference(SubmoduleModel.class, submoduleId);
+        return submoduleRef.getQuestions();
     }
 }
