@@ -2,6 +2,8 @@ package br.com.italo.estuda_ai.controller;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestLogin;
 import br.com.italo.estuda_ai.DTOs.requests.RequestRegister;
+import br.com.italo.estuda_ai.DTOs.responses.ResponseLogin;
+import br.com.italo.estuda_ai.DTOs.responses.ResponseRegister;
 import br.com.italo.estuda_ai.model.UserModel;
 import br.com.italo.estuda_ai.service.AuthService;
 import br.com.italo.estuda_ai.service.TokenService;
@@ -23,19 +25,17 @@ public class AuthController {
     private TokenService tokenService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody RequestLogin requestLogin){
+    public ResponseEntity<ResponseLogin> login(@RequestBody RequestLogin requestLogin){
         Authentication auth = this.authService.login(requestLogin);
+        String token = tokenService.generateToken((UserModel) auth.getPrincipal());
+        return ResponseEntity.ok(new ResponseLogin(token));
 
-        if(auth.isAuthenticated()) {
-            String token = tokenService.generateToken((UserModel) auth.getPrincipal());
-            return ResponseEntity.ok(token);
-        }
-        else return ResponseEntity.badRequest().build();
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody RequestRegister requestRegister){
+    public ResponseEntity<ResponseRegister> register(@RequestBody RequestRegister requestRegister){
         UserModel newUser = this.authService.register(requestRegister);
-        return ResponseEntity.ok().build();
+        ResponseRegister response = new ResponseRegister(newUser.getName(), newUser.getEmail());
+        return ResponseEntity.ok(response);
     }
 }

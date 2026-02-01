@@ -16,4 +16,8 @@ public class GlobalHandlerException  {
     private ResponseEntity<ResponseException> handleItemAlreaddyExists(ItemAlreadyExistsException exception){
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseException(HttpStatus.CONFLICT, exception.getMessage()));
     }
+
+    private ResponseEntity<ResponseException> handelFailedLoginException(FailedLoginException exception){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseException(HttpStatus.UNAUTHORIZED, exception.getMessage()));
+    }
 }
