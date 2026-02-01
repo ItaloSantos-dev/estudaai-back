@@ -27,7 +27,6 @@ public class AuthService {
     private UserRepository userRepository;
 
     public Authentication login(RequestLogin request){
-        System.out.println("1");
         Authentication usernamePassword = new UsernamePasswordAuthenticationToken(request.email(), request.password());
         return this.authenticationManager.authenticate(usernamePassword);
     }

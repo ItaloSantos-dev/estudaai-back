@@ -1,6 +1,7 @@
 package br.com.italo.estuda_ai.controller;
 
 import br.com.italo.estuda_ai.DTOs.requests.RequestSignUpInCourse;
+import br.com.italo.estuda_ai.DTOs.responses.ResponseUser;
 import br.com.italo.estuda_ai.model.UserModel;
 import br.com.italo.estuda_ai.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<UserModel> getAllUsers(){
-        return this.userService.getAll();
+    public ResponseEntity<List<ResponseUser>> getAllUsers(){
+
+        List<UserModel> users = this.userService.getAll();
+        List<ResponseUser> response = users.stream().map(user -> new ResponseUser(user.getName(), user.getEmail(), user.getRole(), user.getNasciment())).toList();
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signup/{id}")
