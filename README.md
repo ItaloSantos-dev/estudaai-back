@@ -59,6 +59,8 @@ mvnw.cmd clean package -DskiptTests
 	  "password":"1131"
   }
 
+  --FUTURAMENTE ADICIONAR UM FRONT END COM ANGULAR
+
 
 
 
