@@ -17,7 +17,15 @@ public class GlobalHandlerException  {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseException(HttpStatus.CONFLICT, exception.getMessage()));
     }
 
+    @ExceptionHandler(FailedLoginException.class)
     private ResponseEntity<ResponseException> handelFailedLoginException(FailedLoginException exception){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseException(HttpStatus.UNAUTHORIZED, exception.getMessage()));
+    }
+
+
+
+    @ExceptionHandler(UserAlreadySignInCourseException.class)
+    private ResponseEntity<ResponseException> handleUserAlreadySignInCourse(UserAlreadySignInCourseException exception){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseException(HttpStatus.CONFLICT, exception.getMessage()));
     }
 }
