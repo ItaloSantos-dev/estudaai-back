@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -46,6 +47,11 @@ public class UserService implements UserDetailsService {
         user.getCourses().add(this.entityManager.getReference(CourseModel.class, UUID.fromString(id)));
 
         this.userRepository.save(user);
+
+    }
+
+    public List<CourseModel> getAllCoursesOfUser(String id){
+        return new ArrayList<>(this.entityManager.getReference(UserModel.class, UUID.fromString(id)).getCourses());
 
     }
 }
